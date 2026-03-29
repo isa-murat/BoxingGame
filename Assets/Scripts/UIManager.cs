@@ -33,7 +33,7 @@ public class UIManager : MonoBehaviour
             restartButton.onClick.AddListener(OnRestartClicked);
         }
 
-        HideResult();
+        HideAllPanels();
     }
 
     public void UpdateHealth(int playerNumber, float current, float max)
@@ -70,26 +70,40 @@ public class UIManager : MonoBehaviour
 
     public void ShowRoundResult(string message)
     {
+        // Once hepsini kapat
+        HideAllPanels();
+
         if (roundResultPanel != null)
         {
             roundResultPanel.SetActive(true);
-            roundResultText.text = message;
+            if (roundResultText != null)
+                roundResultText.text = message;
         }
     }
 
-    public void HideResult()
+    public void ShowGameResult(string message, int winner)
+    {
+        // Once hepsini kapat
+        HideAllPanels();
+
+        if (gameResultPanel != null)
+        {
+            gameResultPanel.SetActive(true);
+            if (gameResultText != null)
+                gameResultText.text = message;
+        }
+    }
+
+    public void HideAllPanels()
     {
         if (roundResultPanel != null) roundResultPanel.SetActive(false);
         if (gameResultPanel != null) gameResultPanel.SetActive(false);
     }
 
-    public void ShowGameResult(string message, int winner)
+    // Eski metod ismi icin uyumluluk
+    public void HideResult()
     {
-        if (gameResultPanel != null)
-        {
-            gameResultPanel.SetActive(true);
-            gameResultText.text = message;
-        }
+        HideAllPanels();
     }
 
     void OnRestartClicked()

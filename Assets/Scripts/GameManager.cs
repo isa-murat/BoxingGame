@@ -50,7 +50,7 @@ public class GameManager : MonoBehaviour
         player2.ResetFighter();
 
         uiManager.UpdateRound(currentRound);
-        uiManager.HideResult();
+        uiManager.HideAllPanels();
     }
 
     public void OnFighterDefeated(FighterController defeated)
@@ -61,15 +61,91 @@ public class GameManager : MonoBehaviour
         if (defeated == player1)
         {
             p2Wins++;
-            uiManager.ShowRoundResult("Oyuncu 2 raund kazandi!");
         }
         else
         {
             p1Wins++;
-            uiManager.ShowRoundResult("Oyuncu 1 raund kazandi!");
         }
 
-        Invoke("NextRound", 2f);
+        // Oyun bitti mi kontrol et
+        int roundsNeeded = (maxRounds / 2) + 1;
+        bool gameOver = false;
+        string gameResultMessage = "";
+        int winner = 0;
+
+        if (p1Wins >= roundsNeeded)
+        {
+            gameOver = true;
+            gameResultMessage = "OYUNCU 1 KAZANDI!";
+            winner = 1;
+        }
+        else if (p2Wins >= roundsNeeded)
+        {
+            gameOver = true;
+            gameResultMessage = "OYUNCU 2 KAZANDI!";
+            winner = 2;
+        }
+        else if (currentRound >= maxRounds)
+        {
+            gameOver = true;
+            if (p1Wins > p2Wins)
+            {
+                gameResultMessage = "OYUNCU 1 KAZANDI!";
+                winner = 1;
+            }
+            else if (p2Wins > p1Wins)
+            {
+                gameResultMessage = "OYUNCU 2 KAZANDI!";
+                winner = 2;
+            }
+            else
+            {
+                gameResultMessage = "BERABERE!";
+                winner = 0;
+            }
+        }
+
+        if (gameOver)
+        {
+            // Direkt oyun sonu goster (raund sonucu gosterme)
+            Invoke("ShowGameOver", 1.5f);
+        }
+        else
+        {
+            // Raund sonucu goster, sonra yeni raunda gec
+            string roundMsg = defeated == player1 ?
+                "Oyuncu 2 raund kazandi!" : "Oyuncu 1 raund kazandi!";
+            uiManager.ShowRoundResult(roundMsg);
+            Invoke("NextRound", 2.5f);
+        }
+    }
+
+    void ShowGameOver()
+    {
+        // Once raund panelini kapat
+        uiManager.HideAllPanels();
+
+        int roundsNeeded = (maxRounds / 2) + 1;
+        string msg;
+        int winner;
+
+        if (p1Wins >= roundsNeeded || p1Wins > p2Wins)
+        {
+            msg = "OYUNCU 1 KAZANDI!";
+            winner = 1;
+        }
+        else if (p2Wins >= roundsNeeded || p2Wins > p1Wins)
+        {
+            msg = "OYUNCU 2 KAZANDI!";
+            winner = 2;
+        }
+        else
+        {
+            msg = "BERABERE!";
+            winner = 0;
+        }
+
+        uiManager.ShowGameResult(msg, winner);
     }
 
     void EndRoundByTime()
@@ -79,53 +155,41 @@ public class GameManager : MonoBehaviour
         float p1Percent = player1.GetHealthPercent();
         float p2Percent = player2.GetHealthPercent();
 
+        string roundMsg;
+
         if (p1Percent > p2Percent)
         {
             p1Wins++;
-            uiManager.ShowRoundResult("Oyuncu 1 raund kazandi!");
+            roundMsg = "Oyuncu 1 raund kazandi!";
         }
         else if (p2Percent > p1Percent)
         {
             p2Wins++;
-            uiManager.ShowRoundResult("Oyuncu 2 raund kazandi!");
+            roundMsg = "Oyuncu 2 raund kazandi!";
         }
         else
         {
-            uiManager.ShowRoundResult("Berabere!");
+            roundMsg = "Berabere!";
         }
 
-        Invoke("NextRound", 2f);
+        // Son raund muydu kontrol et
+        int roundsNeeded = (maxRounds / 2) + 1;
+
+        if (p1Wins >= roundsNeeded || p2Wins >= roundsNeeded || currentRound >= maxRounds)
+        {
+            uiManager.ShowRoundResult(roundMsg);
+            Invoke("ShowGameOver", 2f);
+        }
+        else
+        {
+            uiManager.ShowRoundResult(roundMsg);
+            Invoke("NextRound", 2.5f);
+        }
     }
 
     void NextRound()
     {
         currentRound++;
-
-        // Oyunu kazanan var mi kontrol et
-        int roundsNeeded = (maxRounds / 2) + 1;
-
-        if (p1Wins >= roundsNeeded)
-        {
-            uiManager.ShowGameResult("OYUNCU 1 KAZANDI!", 1);
-            return;
-        }
-        if (p2Wins >= roundsNeeded)
-        {
-            uiManager.ShowGameResult("OYUNCU 2 KAZANDI!", 2);
-            return;
-        }
-
-        if (currentRound > maxRounds)
-        {
-            if (p1Wins > p2Wins)
-                uiManager.ShowGameResult("OYUNCU 1 KAZANDI!", 1);
-            else if (p2Wins > p1Wins)
-                uiManager.ShowGameResult("OYUNCU 2 KAZANDI!", 2);
-            else
-                uiManager.ShowGameResult("BERABERE!", 0);
-            return;
-        }
-
         StartRound();
     }
 

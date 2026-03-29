@@ -2,17 +2,22 @@ using UnityEngine;
 
 public class FighterController : MonoBehaviour
 {
-    public int playerNumber = 1; // 1 veya 2
+    public int playerNumber = 1;
     public float maxHealth = 100f;
     public float attackDamage = 10f;
-    public float attackCooldown = 0.5f;
+    public float attackCooldown = 0.8f;
 
-    public FighterController opponent; // Karsi oyuncu
+    public FighterController opponent;
 
     private float currentHealth;
     private bool isDefending = false;
     private float lastAttackTime = 0f;
     private Animator animator;
+
+    // Saldiri animasyonlari listesi
+    private string[] attackAnims = { "punch" };
+    // Hit reaction rastgele secimi icin
+    private bool useHeadHit = false;
 
     void Start()
     {
@@ -29,32 +34,41 @@ public class FighterController : MonoBehaviour
         if (animator != null)
         {
             animator.SetBool("isDefending", false);
-            animator.SetTrigger("idle");
+            animator.ResetTrigger("punch");
+            animator.ResetTrigger("hit");
+            animator.ResetTrigger("knockout");
+            animator.ResetTrigger("victory");
+            animator.Play("boxing idle", 0, 0f);
         }
 
-        // UI guncelle
         UpdateHealthUI();
     }
 
-    // Butondan cagirilacak
     public void Attack()
     {
         if (!GameManager.Instance.IsRoundActive()) return;
         if (Time.time - lastAttackTime < attackCooldown) return;
+        if (isDefending) return;
 
         lastAttackTime = Time.time;
 
-        // Animasyon tetikle
         if (animator != null)
         {
             animator.SetTrigger("punch");
         }
 
-        // Rakibe hasar ver
-        opponent.TakeDamage(attackDamage);
+        // Kisa gecikme ile hasar ver (yumruk animasyonu ile senkron)
+        Invoke("DealDamage", 0.2f);
     }
 
-    // Butondan cagirilacak (basili tutma)
+    void DealDamage()
+    {
+        if (opponent != null)
+        {
+            opponent.TakeDamage(attackDamage);
+        }
+    }
+
     public void StartDefend()
     {
         if (!GameManager.Instance.IsRoundActive()) return;
@@ -67,7 +81,6 @@ public class FighterController : MonoBehaviour
         }
     }
 
-    // Buton birakilinca
     public void StopDefend()
     {
         isDefending = false;
@@ -82,14 +95,12 @@ public class FighterController : MonoBehaviour
     {
         if (isDefending)
         {
-            // Defans varsa hasar cok azalir
             damage *= 0.1f;
         }
 
         currentHealth -= damage;
         currentHealth = Mathf.Max(0, currentHealth);
 
-        // Hit animasyonu
         if (animator != null && !isDefending)
         {
             animator.SetTrigger("hit");
@@ -99,6 +110,18 @@ public class FighterController : MonoBehaviour
 
         if (currentHealth <= 0)
         {
+            // Knockout animasyonu
+            if (animator != null)
+            {
+                animator.SetTrigger("knockout");
+            }
+
+            // Rakibe victory animasyonu
+            if (opponent != null && opponent.animator != null)
+            {
+                opponent.animator.SetTrigger("victory");
+            }
+
             GameManager.Instance.OnFighterDefeated(this);
         }
     }
