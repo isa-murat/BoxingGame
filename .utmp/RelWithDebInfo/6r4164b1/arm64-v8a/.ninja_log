@@ -1,0 +1,12 @@
+# ninja log v5
+77	590	7968843883440920	FramePacing/CMakeFiles/swappywrapper.dir/UnitySwappyWrapper.cpp.o	f7b9245977c04d06
+592	807	7968843885347184	C:/Users/isamu/Documents/BoxingGame/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6r4164b1/obj/arm64-v8a/libswappywrapper.so	1b9e4d155c6fc41
+35	1289	7968843890383234	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	7a8365435bd1a69b
+44	1297	7968843890449520	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	b9ccd5cbf0283d51
+8	1320	7968843890706982	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	8650c81d921d8c49
+53	1333	7968843890837890	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	c70600f78adea03d
+1	1372	7968843891228067	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	4363d6cbba61332f
+65	1473	7968843892280259	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	bf2eb487b67f4a26
+25	1501	7968843892543903	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	5a71d7d88d054f93
+16	1589	7968843893412342	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	ec00b5d02a15c210
+1589	1665	7968843894207946	C:/Users/isamu/Documents/BoxingGame/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/6r4164b1/obj/arm64-v8a/libgame.so	18a216b9c86345f2
