@@ -51,6 +51,10 @@ public class GameManager : MonoBehaviour
 
         uiManager.UpdateRound(currentRound);
         uiManager.HideAllPanels();
+
+        // Raund baslangic zili
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayBell();
     }
 
     public void OnFighterDefeated(FighterController defeated)
@@ -67,52 +71,20 @@ public class GameManager : MonoBehaviour
             p1Wins++;
         }
 
-        // Oyun bitti mi kontrol et
         int roundsNeeded = (maxRounds / 2) + 1;
         bool gameOver = false;
-        string gameResultMessage = "";
-        int winner = 0;
 
-        if (p1Wins >= roundsNeeded)
+        if (p1Wins >= roundsNeeded || p2Wins >= roundsNeeded || currentRound >= maxRounds)
         {
             gameOver = true;
-            gameResultMessage = "OYUNCU 1 KAZANDI!";
-            winner = 1;
-        }
-        else if (p2Wins >= roundsNeeded)
-        {
-            gameOver = true;
-            gameResultMessage = "OYUNCU 2 KAZANDI!";
-            winner = 2;
-        }
-        else if (currentRound >= maxRounds)
-        {
-            gameOver = true;
-            if (p1Wins > p2Wins)
-            {
-                gameResultMessage = "OYUNCU 1 KAZANDI!";
-                winner = 1;
-            }
-            else if (p2Wins > p1Wins)
-            {
-                gameResultMessage = "OYUNCU 2 KAZANDI!";
-                winner = 2;
-            }
-            else
-            {
-                gameResultMessage = "BERABERE!";
-                winner = 0;
-            }
         }
 
         if (gameOver)
         {
-            // Direkt oyun sonu goster (raund sonucu gosterme)
             Invoke("ShowGameOver", 1.5f);
         }
         else
         {
-            // Raund sonucu goster, sonra yeni raunda gec
             string roundMsg = defeated == player1 ?
                 "Oyuncu 2 raund kazandi!" : "Oyuncu 1 raund kazandi!";
             uiManager.ShowRoundResult(roundMsg);
@@ -122,19 +94,17 @@ public class GameManager : MonoBehaviour
 
     void ShowGameOver()
     {
-        // Once raund panelini kapat
         uiManager.HideAllPanels();
 
-        int roundsNeeded = (maxRounds / 2) + 1;
         string msg;
         int winner;
 
-        if (p1Wins >= roundsNeeded || p1Wins > p2Wins)
+        if (p1Wins > p2Wins)
         {
             msg = "OYUNCU 1 KAZANDI!";
             winner = 1;
         }
-        else if (p2Wins >= roundsNeeded || p2Wins > p1Wins)
+        else if (p2Wins > p1Wins)
         {
             msg = "OYUNCU 2 KAZANDI!";
             winner = 2;
@@ -144,6 +114,10 @@ public class GameManager : MonoBehaviour
             msg = "BERABERE!";
             winner = 0;
         }
+
+        // Kazanma sesi
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayCrowdCheer();
 
         uiManager.ShowGameResult(msg, winner);
     }
@@ -172,7 +146,6 @@ public class GameManager : MonoBehaviour
             roundMsg = "Berabere!";
         }
 
-        // Son raund muydu kontrol et
         int roundsNeeded = (maxRounds / 2) + 1;
 
         if (p1Wins >= roundsNeeded || p2Wins >= roundsNeeded || currentRound >= maxRounds)
@@ -201,5 +174,15 @@ public class GameManager : MonoBehaviour
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void GoToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
     }
 }

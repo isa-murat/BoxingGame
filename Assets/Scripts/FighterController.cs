@@ -14,11 +14,6 @@ public class FighterController : MonoBehaviour
     private float lastAttackTime = 0f;
     private Animator animator;
 
-    // Saldiri animasyonlari listesi
-    private string[] attackAnims = { "punch" };
-    // Hit reaction rastgele secimi icin
-    private bool useHeadHit = false;
-
     void Start()
     {
         currentHealth = maxHealth;
@@ -57,7 +52,6 @@ public class FighterController : MonoBehaviour
             animator.SetTrigger("punch");
         }
 
-        // Kisa gecikme ile hasar ver (yumruk animasyonu ile senkron)
         Invoke("DealDamage", 0.2f);
     }
 
@@ -96,6 +90,15 @@ public class FighterController : MonoBehaviour
         if (isDefending)
         {
             damage *= 0.1f;
+            // Bloklama sesi
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayBlock();
+        }
+        else
+        {
+            // Yumruk sesi
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayPunch();
         }
 
         currentHealth -= damage;
@@ -110,16 +113,22 @@ public class FighterController : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            // Knockout animasyonu
+            // Knockout sesi ve animasyonu
+            if (SoundManager.Instance != null)
+                SoundManager.Instance.PlayKnockout();
+
             if (animator != null)
             {
                 animator.SetTrigger("knockout");
             }
 
-            // Rakibe victory animasyonu
-            if (opponent != null && opponent.animator != null)
+            if (opponent != null)
             {
-                opponent.animator.SetTrigger("victory");
+                Animator oppAnim = opponent.GetComponent<Animator>();
+                if (oppAnim != null)
+                {
+                    oppAnim.SetTrigger("victory");
+                }
             }
 
             GameManager.Instance.OnFighterDefeated(this);
